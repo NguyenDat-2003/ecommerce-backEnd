@@ -1,0 +1,10 @@
+/**
+ * DatDev
+ */
+{
+  "compilerOptions": {
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  }
+}
