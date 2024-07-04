@@ -6,7 +6,7 @@ const createNewUser = async (req, res, next) => {
     const newUser = await userService.createNew(req.body)
     return res.status(StatusCodes.CREATED).json(newUser)
   } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message })
+    next(error)
   }
 }
 export const userController = { createNewUser }

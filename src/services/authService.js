@@ -1,6 +1,8 @@
 /* eslint-disable no-useless-catch */
 import bcrypt from 'bcryptjs'
+import { StatusCodes } from 'http-status-codes'
 import User from '~/models/userModel'
+import ApiError from '~/utils/ApiError'
 
 const signup = async (reqBody) => {
   try {
@@ -25,13 +27,13 @@ const login = async (reqBody) => {
 
     const user = await User.findOne({ email })
     if (!user) {
-      throw new Error('Email not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Incorrect email!')
     }
     const matchUser = await bcrypt.compare(password, user.password)
     if (matchUser) {
       return user
     } else {
-      throw new Error('Pass not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Incorrect password!')
     }
   } catch (error) {
     throw error
