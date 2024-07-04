@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import { userService } from '~/services/userService'
+import { createSignToken } from '~/utils/createSignToken'
 
 const createNewUser = async (req, res, next) => {
   try {
@@ -45,4 +46,22 @@ const deleteUser = async (req, res, next) => {
     next(error)
   }
 }
-export const userController = { createNewUser, getAllUser, getUser, updateUser, deleteUser }
+
+const updatePassword = async (req, res, next) => {
+  try {
+    const user = await userService.updatePassword(req.body, req.user)
+    createSignToken(user, StatusCodes.OK, res)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const updateMe = async (req, res, next) => {
+  try {
+    const user = await userService.updateMe(req.user._id, req.body)
+    return res.status(StatusCodes.OK).json(user)
+  } catch (error) {
+    next(error)
+  }
+}
+export const userController = { createNewUser, getAllUser, getUser, updateUser, deleteUser, updatePassword, updateMe }
