@@ -1,7 +1,9 @@
 /* eslint-disable no-useless-catch */
 import bcrypt from 'bcryptjs'
+import { StatusCodes } from 'http-status-codes'
 
 import User from '~/models/userModel'
+import ApiError from '~/utils/ApiError'
 import validateMongoDbId from '~/utils/validateMongoDbId'
 
 const createNew = async (reqBody) => {
@@ -54,4 +56,32 @@ const deleteDetail = async (id) => {
     throw error
   }
 }
-export const userService = { createNew, getAll, getDetail, updateDetail, deleteDetail }
+
+const updatePassword = async (reqBody, currentUser) => {
+  const { currentPassword, newPassword } = reqBody
+
+  // 1) Get user from collection
+  const user = await User.findById(currentUser._id).select('+password')
+
+  // 2) Check if POSTed current password is correct
+  if (!(await bcrypt.compare(currentPassword, currentUser.password))) {
+    throw new ApiError(StatusCodes.UNAUTHORIZED, 'Your current password is wrong.')
+  }
+  // // 3) If so, update password
+  user.password = await bcrypt.hash(newPassword, 12)
+
+  //-- không sử dụng findByIdAndUpdate cho bất kì điều gì liên quan đến mật khẩu
+  // User.findByIdAndUpdate will NOT work as intended!
+  await user.save()
+
+  return user
+}
+
+const updateMe = async (_id, reqBody) => {
+  try {
+    return await User.findByIdAndUpdate(_id, reqBody)
+  } catch (error) {
+    throw error
+  }
+}
+export const userService = { createNew, getAll, getDetail, updateDetail, deleteDetail, updatePassword, updateMe }

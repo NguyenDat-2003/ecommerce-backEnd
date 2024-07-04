@@ -11,8 +11,13 @@ router.post('/signup', userValidation.createNewUser, authController.signup)
 router.post('/login', authController.login)
 router.post('/logout', authController.logout)
 
+router.post('/forgotPassword', authController.forgotPassword)
+router.put('/resetPassword/:token', authController.resetPassword)
+
 //---Protect all routes after this middleware
 router.use(verifyToken)
+router.put('/updatePassword', userValidation.updatePass, userController.updatePassword)
+router.put('/updateMe', userValidation.updateMe, userController.updateMe)
 
 router.use(restrictTo('admin'))
 router.route('/').get(userController.getAllUser).post(userValidation.createNewUser, userController.createNewUser)

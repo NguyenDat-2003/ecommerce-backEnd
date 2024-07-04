@@ -37,4 +37,35 @@ const updateUser = async (req, res, next) => {
   }
 }
 
-export const userValidation = { createNewUser, updateUser }
+const updatePass = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    currentPassword: Joi.string().required().min(8),
+    newPassword: Joi.string().required().min(8),
+    confirmPassword: Joi.any().valid(Joi.ref('newPassword')).required().messages({ 'any.only': 'Password Confirm does not match' })
+  })
+
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
+  }
+}
+
+const updateMe = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    firstname: Joi.string().trim().strict(),
+    lastname: Joi.string().trim().strict(),
+    email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+    mobile: Joi.string().min(10)
+  })
+
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
+  }
+}
+
+export const userValidation = { createNewUser, updateUser, updatePass, updateMe }
