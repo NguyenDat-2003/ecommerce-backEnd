@@ -9,6 +9,7 @@ router.post('/signup', userValidation.createNewUser, authController.signup)
 router.post('/login', authController.login)
 router.post('/logout', authController.logout)
 
-router.post('/', userValidation.createNewUser, userController.createNewUser)
+router.route('/').get(userController.getAllUser).post(userValidation.createNewUser, userController.createNewUser)
+router.route('/:id').get(userController.getUser).put(userValidation.updateUser, userController.updateUser).delete(userController.deleteUser)
 
 export const userRoute = router
