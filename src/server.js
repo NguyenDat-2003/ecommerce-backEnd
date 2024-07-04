@@ -1,4 +1,6 @@
 import express from 'express'
+import cookieParser from 'cookie-parser'
+
 import DBCONNECT from '~/config/mongoose'
 import { env } from './config/environment'
 import { APIs_V1 } from './routes/v1'
@@ -9,6 +11,7 @@ const app = express()
 DBCONNECT()
 
 // --------------------CONFIG APP----------------------
+app.use(cookieParser())
 app.use(express.json({ limit: '10kb' }))
 
 app.use('/api/v1', APIs_V1)
