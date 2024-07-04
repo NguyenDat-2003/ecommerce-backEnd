@@ -26,7 +26,7 @@ const signup = async (req, res, next) => {
     const newUser = await authService.signup(req.body)
     createSignToken(newUser, StatusCodes.OK, res)
   } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message })
+    next(error)
   }
 }
 
@@ -35,7 +35,7 @@ const login = async (req, res, next) => {
     const user = await authService.login(req.body)
     createSignToken(user, StatusCodes.OK, res)
   } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message })
+    next(error)
   }
 }
 
