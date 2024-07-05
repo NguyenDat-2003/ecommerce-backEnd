@@ -37,6 +37,7 @@ var productSchema = new mongoose.Schema(
       default: 0
     },
     images: [],
+    reviewIds: [],
     totalrating: {
       type: Number,
       default: 0
