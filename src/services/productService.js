@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
 import Product from '~/models/productModel'
-import APIFeatures from '~/utils/apiFeatures'
+import APIFeatures from '~/utils/ApiFeatures'
 import slugify from '~/utils/slugify'
 import validateMongoDbId from '~/utils/validateMongoDbId'
 
