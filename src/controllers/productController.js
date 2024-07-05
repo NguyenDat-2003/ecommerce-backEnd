@@ -46,4 +46,13 @@ const deletePro = async (req, res, next) => {
   }
 }
 
-export const productController = { createNewPro, getPro, getAllPro, updatePro, deletePro }
+const addToWishList = async (req, res, next) => {
+  try {
+    const prod = await productService.addToWishList(req)
+    return res.status(StatusCodes.OK).json(prod)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const productController = { createNewPro, getPro, getAllPro, updatePro, deletePro, addToWishList }
