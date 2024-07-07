@@ -87,4 +87,45 @@ const getWishlist = async (req, res, next) => {
   }
 }
 
-export const userController = { createNewUser, getAllUser, getUser, updateUser, deleteUser, updatePassword, updateMe, uploadUserPhoto, resizeUserImg, getWishlist }
+const addCartUser = async (req, res, next) => {
+  try {
+    const carts = await userService.addCartUser(req.body, req.user._id)
+    return res.status(StatusCodes.OK).json(carts)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const getCartUser = async (req, res, next) => {
+  try {
+    const carts = await userService.getCartUser(req.user._id)
+    return res.status(StatusCodes.OK).json(carts)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const emptyCart = async (req, res, next) => {
+  try {
+    const carts = await userService.emptyCart(req.user._id)
+    return res.status(StatusCodes.OK).json(carts)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const userController = {
+  createNewUser,
+  getAllUser,
+  getUser,
+  updateUser,
+  deleteUser,
+  updatePassword,
+  updateMe,
+  uploadUserPhoto,
+  resizeUserImg,
+  getWishlist,
+  addCartUser,
+  getCartUser,
+  emptyCart
+}

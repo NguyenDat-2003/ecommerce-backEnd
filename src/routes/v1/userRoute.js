@@ -20,6 +20,9 @@ router.put('/updatePassword', userValidation.updatePass, userController.updatePa
 router.put('/updateMe', userController.uploadUserPhoto, userController.resizeUserImg, userController.updateMe)
 
 router.get('/wishlist', userController.getWishlist)
+router.post('/add-cart', userController.addCartUser)
+router.get('/my-cart', userController.getCartUser)
+router.delete('/empty-cart', userController.emptyCart)
 
 router.use(restrictTo('admin'))
 router.route('/').get(userController.getAllUser).post(userValidation.createNewUser, userController.createNewUser)
