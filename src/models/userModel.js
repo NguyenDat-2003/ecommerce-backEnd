@@ -30,7 +30,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: 'user'
     },
-
+    avatar: {
+      type: String,
+      default: ''
+    },
     cart: {
       type: Array,
       default: []

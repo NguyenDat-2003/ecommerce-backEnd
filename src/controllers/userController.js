@@ -1,6 +1,9 @@
 import { StatusCodes } from 'http-status-codes'
+import sharp from 'sharp'
+
 import { userService } from '~/services/userService'
 import { createSignToken } from '~/utils/createSignToken'
+import upload from '~/utils/uploadMulter'
 
 const createNewUser = async (req, res, next) => {
   try {
@@ -58,10 +61,21 @@ const updatePassword = async (req, res, next) => {
 
 const updateMe = async (req, res, next) => {
   try {
-    const user = await userService.updateMe(req.user._id, req.body)
+    const user = await userService.updateMe(req.user._id, req.body, req.file)
     return res.status(StatusCodes.OK).json(user)
   } catch (error) {
     next(error)
   }
 }
-export const userController = { createNewUser, getAllUser, getUser, updateUser, deleteUser, updatePassword, updateMe }
+
+const uploadUserPhoto = upload.single('avatar')
+
+const resizeUserImg = async (req, res, next) => {
+  if (!req.file) return next()
+
+  await sharp(req.file.path).resize(2000, 1333).toFormat('jpeg').jpeg({ quality: 90 })
+
+  next()
+}
+
+export const userController = { createNewUser, getAllUser, getUser, updateUser, deleteUser, updatePassword, updateMe, uploadUserPhoto, resizeUserImg }
