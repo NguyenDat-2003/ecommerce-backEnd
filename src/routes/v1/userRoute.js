@@ -19,6 +19,8 @@ router.use(verifyToken)
 router.put('/updatePassword', userValidation.updatePass, userController.updatePassword)
 router.put('/updateMe', userController.uploadUserPhoto, userController.resizeUserImg, userController.updateMe)
 
+router.get('/wishlist', userController.getWishlist)
+
 router.use(restrictTo('admin'))
 router.route('/').get(userController.getAllUser).post(userValidation.createNewUser, userController.createNewUser)
 router.route('/:id').get(userController.getUser).put(userValidation.updateUser, userController.updateUser).delete(userController.deleteUser)

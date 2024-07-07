@@ -78,4 +78,13 @@ const resizeUserImg = async (req, res, next) => {
   next()
 }
 
-export const userController = { createNewUser, getAllUser, getUser, updateUser, deleteUser, updatePassword, updateMe, uploadUserPhoto, resizeUserImg }
+const getWishlist = async (req, res, next) => {
+  try {
+    const wishList = await userService.getWishlist(req.user._id)
+    return res.status(StatusCodes.OK).json(wishList)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const userController = { createNewUser, getAllUser, getUser, updateUser, deleteUser, updatePassword, updateMe, uploadUserPhoto, resizeUserImg, getWishlist }
