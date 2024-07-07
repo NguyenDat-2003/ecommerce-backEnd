@@ -17,7 +17,7 @@ router.put('/resetPassword/:token', authController.resetPassword)
 //---Protect all routes after this middleware
 router.use(verifyToken)
 router.put('/updatePassword', userValidation.updatePass, userController.updatePassword)
-router.put('/updateMe', userValidation.updateMe, userController.updateMe)
+router.put('/updateMe', userController.uploadUserPhoto, userController.resizeUserImg, userController.updateMe)
 
 router.use(restrictTo('admin'))
 router.route('/').get(userController.getAllUser).post(userValidation.createNewUser, userController.createNewUser)

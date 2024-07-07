@@ -2,13 +2,23 @@
 import Product from '~/models/productModel'
 import User from '~/models/userModel'
 import APIFeatures from '~/utils/ApiFeatures'
+import cloudinaryUploadImg from '~/utils/cloudinaryUploadImg'
 import slugify from '~/utils/slugify'
 import validateMongoDbId from '~/utils/validateMongoDbId'
 
-const createNew = async (reqBody) => {
+const createNew = async (reqBody, reqFiles) => {
+  const images_url = []
   try {
+    await Promise.all(
+      reqFiles.map(async (file) => {
+        const result = await cloudinaryUploadImg(file.path)
+        images_url.push(result.url)
+      })
+    )
+
     const body = {
       ...reqBody,
+      images: images_url,
       slug: slugify(reqBody.name)
     }
     return await Product.create(body)

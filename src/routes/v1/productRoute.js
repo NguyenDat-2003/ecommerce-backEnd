@@ -12,7 +12,7 @@ router.use(verifyToken)
 router.put('/wishlist', productController.addToWishList)
 
 router.use(restrictTo('admin'))
-router.post('/', productController.createNewPro)
+router.post('/', productController.uploadProPhoto, productController.resizeProImg, productController.createNewPro)
 router.put('/:id', productController.updatePro)
 router.delete('/:id', productController.deletePro)
 

@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes'
 
 import User from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
+import cloudinaryUploadImg from '~/utils/cloudinaryUploadImg'
 import validateMongoDbId from '~/utils/validateMongoDbId'
 
 const createNew = async (reqBody) => {
@@ -77,9 +78,15 @@ const updatePassword = async (reqBody, currentUser) => {
   return user
 }
 
-const updateMe = async (_id, reqBody) => {
+const updateMe = async (_id, reqBody, reqFile) => {
   try {
-    return await User.findByIdAndUpdate(_id, reqBody)
+    const result = await cloudinaryUploadImg(reqFile.path)
+    const newBody = {
+      ...reqBody,
+      avatar: result.secure_url
+    }
+
+    return await User.findByIdAndUpdate(_id, newBody, { new: true })
   } catch (error) {
     throw error
   }
