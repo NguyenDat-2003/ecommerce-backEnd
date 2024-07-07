@@ -1,6 +1,8 @@
 /* eslint-disable no-useless-catch */
 import bcrypt from 'bcryptjs'
 import { StatusCodes } from 'http-status-codes'
+import Cart from '~/models/cartModel'
+import Product from '~/models/productModel'
 
 import User from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
@@ -101,4 +103,56 @@ const getWishlist = async (idUser) => {
   }
 }
 
-export const userService = { createNew, getAll, getDetail, updateDetail, deleteDetail, updatePassword, updateMe, getWishlist }
+const addCartUser = async (reqBody, idUser) => {
+  validateMongoDbId(idUser)
+  const { cart } = reqBody
+  try {
+    let products = []
+    const user = await User.findById(idUser)
+    // check if user already have product in cart
+    const alreadyExistCart = await Cart.findOne({ orderby: user._id })
+    if (alreadyExistCart) {
+      alreadyExistCart.remove()
+    }
+    for (let i = 0; i < cart.length; i++) {
+      let object = {}
+      object.product = cart[i].prodId
+      object.count = cart[i].count
+      object.color = cart[i].color
+      let getPrice = await Product.findById(cart[i].prodId).select('price').exec()
+      object.price = getPrice.price
+      products.push(object)
+    }
+    let cartTotal = 0
+    for (let i = 0; i < products.length; i++) {
+      cartTotal = cartTotal + products[i].price * products[i].count
+    }
+    return await Cart.create({
+      products,
+      cartTotal,
+      orderby: user?._id
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
+const getCartUser = async (idUser) => {
+  validateMongoDbId(idUser)
+  try {
+    return await Cart.findOne({ orderby: idUser }).populate('products.product', 'name price quantity')
+  } catch (error) {
+    throw error
+  }
+}
+
+const emptyCart = async (idUser) => {
+  validateMongoDbId(idUser)
+  try {
+    return await Cart.findOneAndRemove({ orderby: idUser })
+  } catch (error) {
+    throw error
+  }
+}
+
+export const userService = { createNew, getAll, getDetail, updateDetail, deleteDetail, updatePassword, updateMe, getWishlist, addCartUser, getCartUser, emptyCart }
