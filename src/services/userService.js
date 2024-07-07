@@ -91,4 +91,14 @@ const updateMe = async (_id, reqBody, reqFile) => {
     throw error
   }
 }
-export const userService = { createNew, getAll, getDetail, updateDetail, deleteDetail, updatePassword, updateMe }
+
+const getWishlist = async (idUser) => {
+  validateMongoDbId(idUser)
+  try {
+    return await User.findById(idUser).populate('wishlist')
+  } catch (error) {
+    throw error
+  }
+}
+
+export const userService = { createNew, getAll, getDetail, updateDetail, deleteDetail, updatePassword, updateMe, getWishlist }
