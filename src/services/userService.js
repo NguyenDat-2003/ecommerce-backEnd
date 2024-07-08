@@ -2,6 +2,8 @@
 import bcrypt from 'bcryptjs'
 import { StatusCodes } from 'http-status-codes'
 import Cart from '~/models/cartModel'
+import Coupon from '~/models/couponModel'
+import Order from '~/models/orderModel'
 import Product from '~/models/productModel'
 
 import User from '~/models/userModel'
@@ -155,4 +157,78 @@ const emptyCart = async (idUser) => {
   }
 }
 
-export const userService = { createNew, getAll, getDetail, updateDetail, deleteDetail, updatePassword, updateMe, getWishlist, addCartUser, getCartUser, emptyCart }
+const applyCoupon = async (idUser, reqBody) => {
+  validateMongoDbId(idUser)
+  try {
+    const validCoupon = await Coupon.findOne({ name: reqBody.coupon })
+    if (!validCoupon) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid Coupon')
+    }
+    let { cartTotal } = await Cart.findOne({
+      orderby: idUser
+    }).populate('products.product')
+    let totalAfterDiscount = (cartTotal - (cartTotal * validCoupon.discount) / 100).toFixed(2)
+    return await Cart.findOneAndUpdate({ orderby: idUser }, { totalAfterDiscount }, { new: true })
+  } catch (error) {
+    throw error
+  }
+}
+
+const cashOrder = async (idUser, reqBody) => {
+  const { COD, couponApplied } = reqBody
+
+  validateMongoDbId(idUser)
+  try {
+    if (!COD) throw new Error('Create cash order failed')
+    let userCart = await Cart.findOne({ orderby: idUser })
+    let finalAmout = 0
+    if (couponApplied && userCart.totalAfterDiscount) {
+      finalAmout = userCart.totalAfterDiscount
+    } else {
+      finalAmout = userCart.cartTotal
+    }
+    // ---- Tạo mới Order
+    await new Order({
+      products: userCart.products,
+      paymentIntent: {
+        // id: uniqid(),
+        method: 'COD',
+        amount: finalAmout,
+        status: 'Cash on Delivery',
+        created: Date.now(),
+        currency: 'usd'
+      },
+      orderby: idUser,
+      orderStatus: 'Cash on Delivery'
+    }).save()
+    // ---- Cập nhật số lượng tồn kho và số lượng đã bán của sản phẩm
+    let update = userCart.products.map((item) => {
+      return {
+        updateOne: {
+          filter: { _id: item.product._id },
+          update: { $inc: { quantity: -item.count, sold: +item.count } }
+        }
+      }
+    })
+    await Product.bulkWrite(update, {})
+    return { message: 'successfully' }
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+export const userService = {
+  createNew,
+  getAll,
+  getDetail,
+  updateDetail,
+  deleteDetail,
+  updatePassword,
+  updateMe,
+  getWishlist,
+  addCartUser,
+  getCartUser,
+  emptyCart,
+  applyCoupon,
+  cashOrder
+}
