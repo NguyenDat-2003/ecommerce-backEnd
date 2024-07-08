@@ -114,6 +114,24 @@ const emptyCart = async (req, res, next) => {
   }
 }
 
+const applyCoupon = async (req, res, next) => {
+  try {
+    const coupon = await userService.applyCoupon(req.user._id, req.body)
+    return res.status(StatusCodes.OK).json(coupon)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const cashOrder = async (req, res, next) => {
+  try {
+    const coupon = await userService.cashOrder(req.user._id, req.body)
+    return res.status(StatusCodes.OK).json(coupon)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const userController = {
   createNewUser,
   getAllUser,
@@ -127,5 +145,7 @@ export const userController = {
   getWishlist,
   addCartUser,
   getCartUser,
-  emptyCart
+  emptyCart,
+  applyCoupon,
+  cashOrder
 }

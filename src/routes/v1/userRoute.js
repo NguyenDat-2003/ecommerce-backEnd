@@ -19,10 +19,18 @@ router.use(verifyToken)
 router.put('/updatePassword', userValidation.updatePass, userController.updatePassword)
 router.put('/updateMe', userController.uploadUserPhoto, userController.resizeUserImg, userController.updateMe)
 
+// --------------------ADD TO WISH LIST--------------
 router.get('/wishlist', userController.getWishlist)
+// --------------------ADD TO CART--------------
 router.post('/add-cart', userController.addCartUser)
 router.get('/my-cart', userController.getCartUser)
 router.delete('/empty-cart', userController.emptyCart)
+
+// --------------------APPLY COUPON --------------
+router.post('/apply-coupon', userController.applyCoupon)
+
+// --------------------CREATE ORDER --------------
+router.post('/cash-order', userController.cashOrder)
 
 router.use(restrictTo('admin'))
 router.route('/').get(userController.getAllUser).post(userValidation.createNewUser, userController.createNewUser)
