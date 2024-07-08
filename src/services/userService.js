@@ -213,10 +213,37 @@ const cashOrder = async (idUser, reqBody) => {
     await Product.bulkWrite(update, {})
     return { message: 'successfully' }
   } catch (error) {
-    throw new Error(error)
+    throw error
   }
 }
 
+const getOrder = async (idUser) => {
+  validateMongoDbId(idUser)
+  try {
+    return await Order.findOne({ orderby: idUser }).populate('products.product').populate('orderby').exec()
+  } catch (error) {
+    throw error
+  }
+}
+
+const updateOrderStatus = async (idUser, reqBody, id) => {
+  const { status } = reqBody
+  validateMongoDbId(idUser)
+  try {
+    return await Order.findByIdAndUpdate(
+      id,
+      {
+        orderStatus: status,
+        paymentIntent: {
+          status: status
+        }
+      },
+      { new: true }
+    )
+  } catch (error) {
+    throw error
+  }
+}
 export const userService = {
   createNew,
   getAll,
@@ -230,5 +257,7 @@ export const userService = {
   getCartUser,
   emptyCart,
   applyCoupon,
-  cashOrder
+  cashOrder,
+  getOrder,
+  updateOrderStatus
 }

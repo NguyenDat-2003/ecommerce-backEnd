@@ -31,6 +31,8 @@ router.post('/apply-coupon', userController.applyCoupon)
 
 // --------------------CREATE ORDER --------------
 router.post('/cash-order', userController.cashOrder)
+router.get('/get-order', userController.getOrder)
+router.put('/update-order/:id', userController.updateOrderStatus)
 
 router.use(restrictTo('admin'))
 router.route('/').get(userController.getAllUser).post(userValidation.createNewUser, userController.createNewUser)
